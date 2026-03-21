@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetailPulse — E-commerce Analytics Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; }
+  header { background: #1a1d2e; padding: 32px 40px; border-bottom: 1px solid #2a2d3e; }
+  header h1 { font-size: 28px; font-weight: 700; color: #fff; }
+  header p { color: #8892a4; margin-top: 6px; font-size: 15px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 32px 40px; }
+  .kpi { background: #1a1d2e; border-radius: 12px; padding: 24px; border: 1px solid #2a2d3e; }
+  .kpi .label { font-size: 13px; color: #8892a4; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi .value { font-size: 32px; font-weight: 700; color: #fff; margin-top: 8px; }
+  .kpi .sub { font-size: 13px; color: #4ade80; margin-top: 4px; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 40px 32px; }
+  .chart-card { background: #1a1d2e; border-radius: 12px; padding: 24px; border: 1px solid #2a2d3e; }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-card h2 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 20px; }
+  .chart-card p { font-size: 13px; color: #8892a4; margin-top: 12px; line-height: 1.6; }
+  canvas { max-height: 300px; }
+  .segment-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .segment-table th { text-align: left; font-size: 12px; color: #8892a4; padding: 8px 12px; border-bottom: 1px solid #2a2d3e; }
+  .segment-table td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid #1a1d2e; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge.champion { background: #052e16; color: #4ade80; }
+  .badge.loyal { background: #0c1a3e; color: #60a5fa; }
+  .badge.potential { background: #2e1065; color: #c084fc; }
+  .badge.atrisk { background: #431407; color: #fb923c; }
+  .badge.lost { background: #450a0a; color: #f87171; }
+  .badge.new { background: #1c1917; color: #d4d4d4; }
+  footer { text-align: center; padding: 24px; color: #4a5568; font-size: 13px; border-top: 1px solid #2a2d3e; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RetailPulse — E-commerce Analytics Dashboard</h1>
+  <p>UK-based online retailer · Dec 2009 – Dec 2010 · Built by Vaibhav Viraj</p>
+</header>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="label">Total Revenue</div>
+    <div class="value">£8.83M</div>
+    <div class="sub">407,664 transactions</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Unique Customers</div>
+    <div class="value">4,312</div>
+    <div class="sub">Across 37 countries</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Unique Products</div>
+    <div class="value">4,017</div>
+    <div class="sub">Gift & home decor items</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Champion Customers</div>
+    <div class="value">1,288</div>
+    <div class="sub">29.9% of customer base</div>
+  </div>
+</div>
+
+<div class="charts-grid">
+
+  <div class="chart-card full">
+    <h2>Monthly Revenue Trend</h2>
+    <canvas id="revenueChart"></canvas>
+    <p>Revenue peaks in Q4 (Oct–Nov 2010), driven by seasonal gift purchasing. November 2010 was the strongest month at £1.17M — nearly double the January trough of £557K.</p>
+  </div>
+
+  <div class="chart-card">
+    <h2>Customer Segments — RFM Analysis</h2>
+    <canvas id="rfmChart"></canvas>
+    <p>29.9% of customers are Champions — high recency, frequency, and spend. 25% are Lost, representing a significant re-engagement opportunity.</p>
+  </div>
+
+  <div class="chart-card">
+    <h2>Revenue by Country</h2>
+    <canvas id="countryChart"></canvas>
+    <p>The UK accounts for 83.95% of all revenue. Ireland and Netherlands are the strongest international markets.</p>
+  </div>
+
+  <div class="chart-card full">
+    <h2>Top 10 Products by Revenue</h2>
+    <canvas id="productChart"></canvas>
+    <p>The White Hanging Heart T-Light Holder leads with £151K in revenue. The Regency Cakestand generates high revenue despite lower unit volume — indicating strong pricing power.</p>
+  </div>
+
+  <div class="chart-card full">
+    <h2>RFM Segment Details</h2>
+    <table class="segment-table">
+      <tr>
+        <th>Segment</th>
+        <th>Customers</th>
+        <th>Avg Days Since Purchase</th>
+        <th>Avg Orders</th>
+        <th>Avg Spend (£)</th>
+        <th>Recommended Action</th>
+      </tr>
+      <tr>
+        <td><span class="badge champion">Champion</span></td>
+        <td>1,288</td><td>18 days</td><td>9.7</td><td>£4,970</td>
+        <td>Reward & retain — loyalty programme</td>
+      </tr>
+      <tr>
+        <td><span class="badge loyal">Loyal</span></td>
+        <td>603</td><td>25 days</td><td>2.3</td><td>£586</td>
+        <td>Upsell — product bundles & recommendations</td>
+      </tr>
+      <tr>
+        <td><span class="badge potential">Potential Loyalist</span></td>
+        <td>782</td><td>83 days</td><td>3.8</td><td>£1,488</td>
+        <td>Nurture — personalised email campaigns</td>
+      </tr>
+      <tr>
+        <td><span class="badge new">New Customer</span></td>
+        <td>299</td><td>30 days</td><td>1.0</td><td>£361</td>
+        <td>Onboard — welcome series, first repeat discount</td>
+      </tr>
+      <tr>
+        <td><span class="badge atrisk">At Risk</span></td>
+        <td>264</td><td>84 days</td><td>1.0</td><td>£435</td>
+        <td>Re-engage — win-back offer</td>
+      </tr>
+      <tr>
+        <td><span class="badge lost">Lost</span></td>
+        <td>1,076</td><td>240 days</td><td>1.8</td><td>£642</td>
+        <td>Last chance — deep discount reactivation</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<footer>RetailPulse · Vaibhav Viraj · Data Source: UCI Online Retail II Dataset</footer>
+
+<script>
+const months = ['Dec 09','Jan 10','Feb 10','Mar 10','Apr 10','May 10','Jun 10','Jul 10','Aug 10','Sep 10','Oct 10','Nov 10','Dec 10'];
+const revenue = [686654,557319,506371,699609,594609,599986,639067,591637,604243,831615,1036680,1172336,311878];
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [{
+      label: 'Revenue (£)',
+      data: revenue,
+      backgroundColor: revenue.map(v => v > 900000 ? '#4ade80' : '#3b82f6'),
+      borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { ticks: { color: '#8892a4', callback: v => '£' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#2a2d3e' } },
+      x: { ticks: { color: '#8892a4' }, grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('rfmChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Champion','Lost','Potential Loyalist','Loyal','New Customer','At Risk'],
+    datasets: [{
+      data: [1288, 1076, 782, 603, 299, 264],
+      backgroundColor: ['#4ade80','#f87171','#c084fc','#60a5fa','#d4d4d4','#fb923c'],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    plugins: { legend: { position: 'right', labels: { color: '#e0e0e0', padding: 16 } } },
+    cutout: '60%'
+  }
+});
+
+new Chart(document.getElementById('countryChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK','EIRE','Netherlands','Germany','France','Sweden','Denmark','Spain'],
+    datasets: [{
+      data: [7414756, 356085, 268786, 202395, 146215, 53171, 50907, 47601],
+      backgroundColor: '#818cf8',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { ticks: { color: '#8892a4', callback: v => '£' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#2a2d3e' } },
+      x: { ticks: { color: '#8892a4' }, grid: { display: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('productChart'), {
+  type: 'bar',
+  data: {
+    labels: ['White Heart T-Light','Regency Cakestand','Assorted Bird Ornament','Jumbo Bag Retrospot','Rotating Angels T-Light','Paper Chain Kit','Party Bunting','Edwardian Parasol'],
+    datasets: [{
+      data: [151624, 143893, 70494, 51759, 40187, 36934, 35036, 34045],
+      backgroundColor: '#f59e0b',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: '#8892a4', callback: v => '£' + (v/1000).toFixed(0) + 'K' }, grid: { color: '#2a2d3e' } },
+      y: { ticks: { color: '#8892a4' }, grid: { display: false } }
+    }
+  }
+});
+</script>
+</body>
+</html>
